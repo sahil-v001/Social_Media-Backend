@@ -3,6 +3,8 @@
 A production-ready backend system for a social media platform built using **FastAPI**.  
 This project demonstrates scalable API design, authentication, database integration, testing, and CI/CD practices.
 
+#Note: I used comments throughout the codebase to help people unfamiliar with the tech stack understand the project more easily.
+
 ---
 
 ## 🚀 Overview
