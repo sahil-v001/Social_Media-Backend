@@ -45,7 +45,7 @@ async def get_post(id: int , response : Response):   # we can remove this except
     for post in my_posts:
         if post["id"] == id:
           return {"post_detail": post}
-    
+     
    # response.status_code = status.HTTP_404_NOT_FOUND
    # return {"message": f"Post with id:{id} was not found"}
    
