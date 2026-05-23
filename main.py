@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI , Response , status , HTTPException # this time i included the header for catching exceptions
 from fastapi.params import Body
 from pydantic import BaseModel
 from random import randrange
@@ -32,4 +32,36 @@ async def Create_Post(post : Post): # i used pydantic here , i mean its a kind o
   post_dict = post.model_dump();
   post_dict["id"] = randrange(0,1000000)
   my_posts.append(post_dict)
-  return {"data" : post_dict}
+  raise HTTPException(status_code=status.HTTP_201_CREATED,
+                      detail=post_dict)
+
+@app.get("/posts/latest") # to check the latest appended post
+async def get_latest_post():
+  post =  my_posts[len(my_posts)-1]
+  return {"details": post}
+
+@app.get("/posts/{id}")
+async def get_post(id: int , response : Response):   # we can remove this exception  , because we used the HTTP exception , which do the same work in one line
+    for post in my_posts:
+        if post["id"] == id:
+          return {"post_detail": post}
+    
+   # response.status_code = status.HTTP_404_NOT_FOUND
+   # return {"message": f"Post with id:{id} was not found"}
+   
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , 
+                       detail=f"post with id:{id} wan not found")
+    
+
+@app.delete("/posts/{id}" , status_code=status.HTTP_204_NO_CONTENT) # to delete the post with it's id , in modern way
+async def delete_post(id: int):
+
+    for post in my_posts:
+        if post["id"] == id:
+            my_posts.remove(post) # we keep the return empty , because 204 is literaly return nothing
+            return 
+
+    raise HTTPException(   #used it when we are like want to raise querry where there is an error
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Post with id:{id} not found to delete"
+    )   
