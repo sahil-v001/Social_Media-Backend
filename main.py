@@ -65,3 +65,23 @@ async def delete_post(id: int):
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Post with id:{id} not found to delete"
     )   
+    
+    
+@app.put("/posts/{id}")
+async def update_post(id: int, updated_post: Post):
+
+    for post in my_posts:
+        if post["id"] == id:
+
+            post["title"] = updated_post.title
+            post["content"] = updated_post.content
+
+            return {
+                "message": "Post updated",
+                "post": post
+            }
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Post with id:{id} was not found"
+    )
