@@ -8,7 +8,7 @@ from psycopg2.extras import RealDictCursor
 import time
 from .import models
 from .database import engine , SessionLocal , get_db
-from sqlalchemy.orm import session
+from sqlalchemy.orm import Session
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -16,7 +16,6 @@ class Post(BaseModel):
   title : str
   content : str
   published : bool = True
-  rating : int = 0
 
 ############## for the connection with the database on our local system
 while True:
@@ -46,26 +45,22 @@ async def root():
 
 @app.get("/posts")
 def get_post():
-    cursor.execute("""SELECT * FROM "POSTS" """)
+    cursor.execute("""SELECT * FROM posts """)
     posts = cursor.fetchall()
     return {"data": posts}
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
 async def Create_Post(post: Post):
-    cursor.execute("""INSERT INTO "POSTS"(title , content , published) VALUES(%s,%s,%s) RETURNING *""",(post.title , post.content , post.published))
+    cursor.execute("""INSERT INTO posts (title , content , published) VALUES(%s,%s,%s) RETURNING *""",(post.title , post.content , post.published))
     new_post = cursor.fetchone()
     conn.commit()
     return {"data":new_post}
 
-@app.get("/posts/latest") # to check the latest appended post
-async def get_latest_post():
-  post =  my_posts[len(my_posts)-1]
-  return {"details": post}
 
 @app.get("/posts/{id}")
 async def get_post(id: int):
 
-    cursor.execute("""SELECT * FROM "POSTS" WHERE id = %s""",(id,))
+    cursor.execute("""SELECT * FROM posts WHERE id = %s""",(id,))
     post = cursor.fetchone()
 
     if post is None:
@@ -79,7 +74,7 @@ async def get_post(id: int):
 @app.delete("/posts/{id}" , status_code=status.HTTP_204_NO_CONTENT) # to delete the post with it's id , in modern way
 async def delete_post(id: int):
   
-    cursor.execute("""DELETE FROM "POSTS" WHERE id = %s RETURNING *""",(id,))
+    cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *""",(id,))
     deleted_post = cursor.fetchone()
     
     if deleted_post is None:
@@ -96,7 +91,7 @@ async def update_post(id: int, updated_post: Post):
 
     cursor.execute(
         """
-        UPDATE "POSTS"
+        UPDATE posts
         SET title = %s,
             content = %s,
             published = %s
