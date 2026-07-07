@@ -1,11 +1,16 @@
 # to run the code -> uvicorn app.main:app --reload  
-from fastapi import FastAPI , Response , status , HTTPException # this time i included the header for catching exceptions
+from fastapi import FastAPI , Response , status , HTTPException  , Depends# this time i included the header for catching exceptions
 from fastapi.params import Body
 from pydantic import BaseModel
 from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
+from .import models
+from .database import engine , SessionLocal , get_db
+from sqlalchemy.orm import session
+
+models.Base.metadata.create_all(bind=engine)
 
 class Post(BaseModel):
   title : str
@@ -33,6 +38,7 @@ while True:
   
 
 app = FastAPI() # instance of fast api
+  
 
 @app.get("/") # here get is just one of the HTTP method
 async def root():
