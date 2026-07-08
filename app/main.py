@@ -1,5 +1,5 @@
 # to run the code -> uvicorn app.main:app --reload  
-from fastapi import FastAPI , Response , status , HTTPException  , Depends# this time i included the header for catching exceptions
+from fastapi import FastAPI , Response , status , HTTPException  , Depends # this time i included the header for catching exceptions
 from fastapi.params import Body
 from pydantic import BaseModel
 from random import randrange
