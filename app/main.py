@@ -43,11 +43,16 @@ app = FastAPI() # instance of fast api
 async def root():
   return {"message" : "Hello Sahil"}  # fast api convert this into a json , whichis the universal for wev dev
 
+# now we using sql alchemy orm
 @app.get("/posts")
-def get_post():
-    cursor.execute("""SELECT * FROM posts """)
-    posts = cursor.fetchall()
+def get_post(db: Session = Depends(get_db)):
+    posts = db.query(models.Post).all()
+    print(posts)
     return {"data": posts}
+# here i used psycopg2
+# def get_post():
+#     cursor.execute("""SELECT * FROM posts """)
+#     posts = cursor.fetchall()
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
 async def Create_Post(post: Post):
