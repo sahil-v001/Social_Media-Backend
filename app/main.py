@@ -6,36 +6,14 @@ from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
-from .import models , schemas
+from .import models , schemas, utils
 from .database import engine , SessionLocal , get_db
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
 
-pwd_context = CryptContext(schemes=["bcrypt"] , deprecated = "auto")
 models.Base.metadata.create_all(bind=engine)
-
-############## for the connection with the database on our local system through psycopg2
-# while True:
-#   try:
-#     conn = psycopg2.connect(
-#         host='localhost',
-#         database='SOCIAL_MEDIA',
-#         user='postgres',
-#         password='1234',
-#         cursor_factory=RealDictCursor    #with realdict cursor , we can access valuse by name ex-> id["sahil"]
-#     )
-#     cursor = conn.cursor()
-#     print("Database Connected Successfully!")
-#     break
-#   except Exception as error:
-#     print("Connection to DataBase Failed")
-#     print("Error: ",error)
-#     time.sleep(2)
-  
 
 app = FastAPI() # instance of fast api
   
-
 @app.get("/") # here get is just one of the HTTP method
 async def root():
   return {"message" : "Hello Sahil"}  # fast api convert this into a json , whichis the universal for wev dev
@@ -116,9 +94,8 @@ def create_user( user: schemas.UserCreate,db: Session = Depends(get_db)):
                             detail= "Email is already present")
         
     # here we hashed the passord , so that it can be safely saved
-    hashed_password = pwd_context.hash(user.password)
-    user.password = hashed_password
-    
+
+    utils.hashed(user)
     new_user = models.User(**user.model_dump())
     db.add(new_user)
     db.commit()
