@@ -57,17 +57,18 @@ async def Create_Post(post: schemas.Post_Create, db:Session = Depends(get_db)):
     return new_post
 
 
-@app.get("/posts/{id}")
-async def get_post(id: int, db:Session = Depends(get_db)):
+@app.get("/posts/{id}", response_model=schemas.post_back)
+async def get_post(id: int, db: Session = Depends(get_db)):
 
-    post = db.query(models.Post).filter(models.Post.id==id).first() # .first returns the post object , not the query anymore
+    post = db.query(models.Post).filter(models.Post.id == id).first()
+
     if post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"post with id:{id} was not found" 
+            detail=f"Post with id:{id} was not found"
         )
-    print(post)
-    return {"post_detail": post}
+
+    return post
     
 @app.delete("/posts/{id}" , status_code=status.HTTP_204_NO_CONTENT) # to delete the post with it's id , in modern way
 async def delete_post(id: int , db:Session = Depends(get_db)):
@@ -84,8 +85,8 @@ async def delete_post(id: int , db:Session = Depends(get_db)):
     # conn.commit()
     return 
 
-@app.put("/posts/{id}")
-async def update_post(id: int, updated_post: schemas.Post_Update , db:Session = Depends(get_db)):
+@app.put("/posts/{id}", response_model=schemas.post_back)
+async def update_post(id: int, updated_post: schemas.Post_Update, db: Session = Depends(get_db)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
 
     post = post_query.first()
@@ -101,7 +102,4 @@ async def update_post(id: int, updated_post: schemas.Post_Update , db:Session = 
 
     updated_post = post_query.first()
 
-    return {
-        "message": "Post updated",
-        "post": updated_post
-    }
+    return updated_post
