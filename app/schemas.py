@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict , EmailStr, Field
 from datetime import datetime
 
 class Post_Create(BaseModel):
@@ -13,4 +13,18 @@ class post_back(Post_Create):
     id: int
     created_at: datetime
 
+    model_config = ConfigDict(from_attributes=True)
+
+
+# here we made the user schema 
+class UserCreate(BaseModel):
+  password: str = Field(min_length=8, max_length=72)
+  email : EmailStr
+  
+# here we using it as pydantic , to check id the required things are correct or not
+class User_check(BaseModel):
+    id : int 
+    email : EmailStr
+    # password : str
+    created_at : datetime
     model_config = ConfigDict(from_attributes=True)

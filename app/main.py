@@ -9,10 +9,10 @@ import time
 from .import models , schemas
 from .database import engine , SessionLocal , get_db
 from sqlalchemy.orm import Session
+from passlib.context import CryptContext
 
+pwd_context = CryptContext(schemes=["bcrypt"] , deprecated = "auto")
 models.Base.metadata.create_all(bind=engine)
-
-
 
 ############## for the connection with the database on our local system through psycopg2
 # while True:
@@ -103,3 +103,43 @@ async def update_post(id: int, updated_post: schemas.Post_Update, db: Session = 
     updated_post = post_query.first()
 
     return updated_post
+
+#           here we are making user data , where we will create all the crud operations for user profile
+
+@app.post("/users",status_code=status.HTTP_201_CREATED, response_model= schemas.User_check)
+def create_user( user: schemas.UserCreate,db: Session = Depends(get_db)):
+    
+    em = db.query(models.User).filter(models.User.email== user.email).first(); # here we checked if the user with same email is present or not
+    
+    if em :
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail= "Email is already present")
+        
+    # here we hashed the passord , so that it can be safely saved
+    hashed_password = pwd_context.hash(user.password)
+    user.password = hashed_password
+    
+    new_user = models.User(**user.model_dump())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+@app.get("/users/{id}",status_code=status.HTTP_200_OK , response_model=schemas.User_check)
+def get_user(id: int , db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == id).first()
+
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Post with id:{id} was not found"
+        )
+
+    return user
+
+@app.get("/users")
+def get_users(db: Session = Depends(get_db)):
+    users = db.query(models.User).all()
+    print(users)
+
+    return users
