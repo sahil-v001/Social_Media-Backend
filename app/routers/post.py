@@ -11,7 +11,7 @@ router = APIRouter(
 
 # Here we are using SQLAlchemy ORM to fetch all posts.
 @router.get("/", response_model=list[schemas.post_back])
-def get_posts(db: Session = Depends(get_db), user_id: int= Depends(oauth2.get_current_user)):
+def get_posts(db: Session = Depends(get_db), current_user: int= Depends(oauth2.get_current_user)):
 
     posts = db.query(models.Post).all()
 
@@ -20,7 +20,7 @@ def get_posts(db: Session = Depends(get_db), user_id: int= Depends(oauth2.get_cu
 
 # Create a new post.
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.post_back)
-def create_post(post: schemas.Post_Create, db: Session = Depends(get_db) , user_id: int= Depends(oauth2.get_current_user)):
+def create_post(post: schemas.Post_Create, db: Session = Depends(get_db) , current_user: int= Depends(oauth2.get_current_user)):
 
     # Convert the Pydantic model into a SQLAlchemy model.
     new_post = models.Post(**post.model_dump())
@@ -35,7 +35,7 @@ def create_post(post: schemas.Post_Create, db: Session = Depends(get_db) , user_
 
 # Get a particular post using its ID.
 @router.get("/{id}", response_model=schemas.post_back)
-def get_post(id: int, db: Session = Depends(get_db), user_id: int= Depends(oauth2.get_current_user)):
+def get_post(id: int, db: Session = Depends(get_db), current_user: int= Depends(oauth2.get_current_user)):
 
     post = db.query(models.Post).filter(models.Post.id == id).first()
 
@@ -51,7 +51,7 @@ def get_post(id: int, db: Session = Depends(get_db), user_id: int= Depends(oauth
 
 # Delete a post using its ID.
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db), user_id: int= Depends(oauth2.get_current_user)):
+def delete_post(id: int, db: Session = Depends(get_db), current_user: int= Depends(oauth2.get_current_user)):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
 
@@ -75,7 +75,7 @@ def update_post(
     id: int,
     updated_post: schemas.Post_Update,
     db: Session = Depends(get_db),
-    user_id: int= Depends(oauth2.get_current_user)
+    current_user: int= Depends(oauth2.get_current_user)
 ):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
