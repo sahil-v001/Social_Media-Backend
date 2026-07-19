@@ -36,9 +36,9 @@ class User_Cred(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
     
-class token_type(BaseModel):
+class token(BaseModel):
     access_token : str
     token_type : str
    
 class token_data(BaseModel):
-    id:Optional[str]= None
+    id:Optional[int]= None

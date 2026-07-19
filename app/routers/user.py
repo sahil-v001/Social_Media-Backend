@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from .. import models, schemas, utils
+from .. import models, schemas, utils ,oauth2
 from ..database import get_db
 
 # Router for all user-related APIs
@@ -41,7 +41,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 # Get a particular user using their ID.
 @router.get("/{id}", response_model=schemas.User_check)
-def get_user(id: int, db: Session = Depends(get_db)):
+def get_user(id: int, db: Session = Depends(get_db),user_id: int= Depends(oauth2.get_current_user)):
 
     user = db.query(models.User).filter(models.User.id == id).first()
 
@@ -57,7 +57,7 @@ def get_user(id: int, db: Session = Depends(get_db)):
 
 # Get all users from the database.
 @router.get("/", response_model=list[schemas.User_check])
-def get_users(db: Session = Depends(get_db)):
+def get_users(db: Session = Depends(get_db),user_id: int= Depends(oauth2.get_current_user)):
 
     users = db.query(models.User).all()
 
