@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict , EmailStr, Field
 from datetime import datetime
+from typing import Optional
 
 class Post_Create(BaseModel):
     title: str
@@ -34,3 +35,10 @@ class User_Cred(BaseModel):
     password: str
 
     model_config = ConfigDict(from_attributes=True)
+    
+class token_type(BaseModel):
+    access_token : str
+    token_type : str
+   
+class token_data(BaseModel):
+    id:Optional[str]= None
