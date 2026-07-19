@@ -28,3 +28,9 @@ class User_check(BaseModel):
     # password : str
     created_at : datetime
     model_config = ConfigDict(from_attributes=True)
+
+class User_Cred(BaseModel):
+    email: EmailStr
+    password: str
+
+    model_config = ConfigDict(from_attributes=True)
