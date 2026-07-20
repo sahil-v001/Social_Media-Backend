@@ -13,6 +13,7 @@ class Post_Update(Post_Create):
 class post_back(Post_Create):
     id: int
     created_at: datetime
+    user_id : int
 
     model_config = ConfigDict(from_attributes=True)
 

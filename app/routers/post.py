@@ -23,7 +23,7 @@ def get_posts(db: Session = Depends(get_db), current_user: int= Depends(oauth2.g
 def create_post(post: schemas.Post_Create, db: Session = Depends(get_db) , current_user: int= Depends(oauth2.get_current_user)):
 
     # Convert the Pydantic model into a SQLAlchemy model.
-    new_post = models.Post(**post.model_dump())
+    new_post = models.Post(user_id=current_user.id,**post.model_dump())
 
     # Save the post to the database.
     db.add(new_post)
