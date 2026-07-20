@@ -10,12 +10,7 @@ class Post_Create(BaseModel):
 class Post_Update(Post_Create):
     published: bool
 
-class post_back(Post_Create):
-    id: int
-    created_at: datetime
-    user_id : int
 
-    model_config = ConfigDict(from_attributes=True)
 
 
 # here we made the user schema 
@@ -43,3 +38,11 @@ class token(BaseModel):
    
 class token_data(BaseModel):
     id:Optional[int]= None
+    
+class post_back(Post_Create):
+    id: int
+    created_at: datetime
+    user_id : int
+    owner : User_check  
+
+    model_config = ConfigDict(from_attributes=True)
