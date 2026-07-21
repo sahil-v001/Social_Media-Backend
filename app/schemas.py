@@ -9,10 +9,6 @@ class Post_Create(BaseModel):
 
 class Post_Update(Post_Create):
     published: bool
-
-
-
-
 # here we made the user schema 
 class UserCreate(BaseModel):
   password: str = Field(min_length=8, max_length=72)
