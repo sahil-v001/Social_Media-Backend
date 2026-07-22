@@ -42,3 +42,13 @@ class post_back(Post_Create):
     owner : User_check  
 
     model_config = ConfigDict(from_attributes=True)
+
+class post_out(BaseModel):
+    Post: post_back
+    votes: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+class Voting(BaseModel):
+    post_id: int
+    dir: int = Field(..., ge=0, le=1)

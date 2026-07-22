@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session 
+from sqlalchemy import func
 from .. import models, schemas ,oauth2
 from ..database import get_db
 
@@ -10,12 +11,13 @@ router = APIRouter(
 )
 
 # Here we are using SQLAlchemy ORM to fetch all posts.
-@router.get("/", response_model=list[schemas.post_back])
+@router.get("/", response_model=list[schemas.post_out])
 def get_posts(db: Session = Depends(get_db), current_user: int= Depends(oauth2.get_current_user)):
 
-    posts = db.query(models.Post).all()
+    post = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
+    models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).all()
 
-    return posts
+    return post
 
 
 # Create a new post.
@@ -34,10 +36,19 @@ def create_post(post: schemas.Post_Create, db: Session = Depends(get_db) , curre
 
 
 # Get a particular post using its ID.
-@router.get("/{id}", response_model=schemas.post_back)
+@router.get("/{id}", response_model=schemas.post_out)
 def get_post(id: int, db: Session = Depends(get_db), current_user: int= Depends(oauth2.get_current_user)):
 
-    post = db.query(models.Post).filter(models.Post.id == id).first()
+    post = (
+    db.query(
+        models.Post,
+        func.count(models.Vote.post_id).label("votes")
+    )
+    .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
+    .group_by(models.Post.id)
+    .filter(models.Post.id == id)
+    .first()
+)
 
     # If the post doesn't exist, return a 404 response.
     if post is None:
